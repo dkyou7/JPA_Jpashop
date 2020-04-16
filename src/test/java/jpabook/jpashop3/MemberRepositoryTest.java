@@ -19,13 +19,21 @@ public class MemberRepositoryTest {
 
     @Test
     @Transactional
-    public void testMember() throws Exception{
+    @Rollback
+    // 맴버에 저장된 값은 한 트랜잭션 내부에서 아이디값, 유저 이름값이 같다.
+    public void testMember(){
         Member member = new Member();
-        member.setUsername("memberA");
+        member.setUsername("memeberA");
+        // 객체 저장 후 저장된 아이디 반환!
         Long savedId = memberRepository.save(member);
+
+        // 다시 찾아와!
         Member findMember = memberRepository.find(savedId);
+
+        // 저장된거 아이디가 디비 거쳐서 나온 아이디와 같을 것인가?
         Assertions.assertThat(findMember.getId()).isEqualTo(member.getId());
         Assertions.assertThat(findMember.getUsername()).isEqualTo(member.getUsername());
-        Assertions.assertThat(findMember).isEqualTo(member); //JPA 엔티티 동일성 보장
+        // 객체도 같을건인가? 한 트랜잭션 내부에서 이루어지므로 같은 객체, 같은 해시값 가진다!
+        Assertions.assertThat(findMember).isEqualTo(member);
     }
 }
